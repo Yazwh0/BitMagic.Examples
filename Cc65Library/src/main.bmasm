@@ -10,10 +10,9 @@ var songFilename = "SONG1.ZSM";
 
     BM.X16Header();
     nop
-
     sei 
 
-    ; init ZSM to use bank 1
+    ; Initialise ZSMKit to use bank 1.
     lda #1
     jsr zsm:zsm_init_engine
 
