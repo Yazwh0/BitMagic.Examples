@@ -6,7 +6,7 @@ The library used in the example is [ZSMKit](https://github.com/mooinglemur/zsmki
 
 It loads the library and outputs the libraries `ZSMKITLIB` segment that contains the code into the Main segment in the BitMagic project. The segment `ZSMKITBANK` is written to a BitMagic segment within the Banked RAM.
 
-The file is loaded at the end of the example's code. ZSMKit is then called to point to that code. The filename is a macro variable, so we can write the filename into the source but also ensure the length parameter is always correct.
+The file is loaded at the end of the example's code. ZSMKit is then called to point to that code. The filename is a macro variable, so we can write the filename to be passed to `SETNAM` but also ensure the length parameter is always correct. The local file is set to be copied to the SDCard in the `project.json` file.
 
 A simple loop that waits until the VSYNC IRQ and then calls ZSMKit's 'tick' function to play back the music.
 

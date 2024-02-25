@@ -1,7 +1,7 @@
 {
     "source": "src\\main.bmasm",
     "sdCardFiles": [
-        "SONG1.ZSM"
+        "zsmkit\\demo\\SONG1.ZSM"
     ],
     "compileOptions": {
         "DisplaySegments": true,
