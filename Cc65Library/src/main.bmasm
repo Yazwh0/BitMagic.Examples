@@ -1,0 +1,69 @@
+import BM="BM.bmasm";
+import CC65="cc65library.bmasm";
+
+var obj = CC65.Parse(@"..\zsmkit\lib\zsmkit.lib", "zsm", @"..\zsmkit\");
+
+var songFilename = "SONG1.ZSM";
+
+.machine CommanderX16R42
+
+BM.X16Header();
+    nop
+
+    sei 
+
+    ; init ZSM to use bank 1
+    lda #1
+    jsr zsm:zsm_init_engine
+
+    lda #@(songFilename.Length)
+    ldx #<songname
+    ldy #>songname
+    jsr SETNAM
+
+    lda #2
+    ldx #8
+    ldy #2
+    jsr SETLFS
+
+    lda #0
+    ldx #<loadpos
+    ldy #>loadpos
+    jsr LOAD 
+
+    ldx #0
+    lda #<loadpos
+    ldy #>loadpos
+    jsr zsm:zsm_setmem
+
+    ldx #0
+    jsr zsm:zsm_play
+
+    ; only VSYNC
+    lda #01
+    sta IEN
+
+    cli
+
+.loop:
+    wai
+    lda #0
+    jsr zsm:zsm_tick
+    jmp loop
+
+.songname:
+    BM.Bytes(songFilename);
+
+
+CC65.Code("ZSMKITLIB", obj);
+
+.scope Main
+; use this as a position to load the song
+.loadpos:
+.endscope
+
+CC65.Exports(obj);
+
+.segment ZSMBANK, $a000, $2000, _, zsm
+CC65.Code("ZSMKITBANK", obj);
+.endsegment
