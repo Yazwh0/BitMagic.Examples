@@ -1,6 +1,7 @@
 import BM="BM.bmasm";
 import CC65="cc65library.bmasm";
 
+; Location of the library file, the scope name, and the basepath for the code mapping.
 var obj = CC65.Parse(@"..\zsmkit\lib\zsmkit.lib", "zsm", @"..\zsmkit\");
 
 var songFilename = "SONG1.ZSM";
@@ -16,6 +17,9 @@ BM.X16Header();
     lda #1
     jsr zsm:zsm_init_engine
 
+    ; Load the song into memory after this code.
+    ; This isn't the recommended way to load files, see ZSMKit's readme for more details:
+    ; https://github.com/mooinglemur/zsmkit/blob/main/README.md
     lda #@(songFilename.Length)
     ldx #<songname
     ldy #>songname
@@ -31,22 +35,27 @@ BM.X16Header();
     ldy #>loadpos
     jsr LOAD 
 
+    ; Tell ZSMKit where the song is.
     ldx #0
     lda #<loadpos
     ldy #>loadpos
     jsr zsm:zsm_setmem
 
+    ; Start playing Song 0.
     ldx #0
     jsr zsm:zsm_play
 
-    ; only VSYNC
+    ; Ensure only VSYNC is enabled.
     lda #01
     sta IEN
 
     cli
 
 .loop:
+    ; Wait for a IRQ, this will continue after the Kernel IRQ handler has completed.
     wai
+
+    ; Play the song for this 'tick'.
     lda #0
     jsr zsm:zsm_tick
     jmp loop
@@ -54,16 +63,17 @@ BM.X16Header();
 .songname:
     BM.Bytes(songFilename);
 
-
+; Output the segment containing the code. See ZSMKit's readme for more details.
 CC65.Code("ZSMKITLIB", obj);
 
 .scope Main
-; use this as a position to load the song
+; Use this as a position to load the song. Its the last label in the file so the song data will be loaded directly after.
 .loadpos:
 .endscope
 
 CC65.Exports(obj);
 
+; Output the segment containing the data which needs to be in a bank. See ZSMKit's readme for more details.
 .segment ZSMBANK, $a000, $2000, _, zsm
 CC65.Code("ZSMKITBANK", obj);
 .endsegment
