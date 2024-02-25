@@ -1,0 +1,3 @@
+[submodule "Cc65Library/zsmkit"]
+	path = Cc65Library/zsmkit
+	url = https://github.com/mooinglemur/zsmkit.git
