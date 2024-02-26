@@ -16,6 +16,12 @@ ZSMKit's git repo is included as a [submodule](https://git-scm.com/book/en/v2/Gi
 
 This will need to have a recent version pulled and built. To do this please check CC65 and the ZSMKit repo for instructions. The output library file `lib\zsmkit.lib` must be present as this will be imported into the BitMagic project.
 
+## Debugging the library files
+
+It is possible to debug the libraries files in the same way as you do BitMagic Asm files. To do so change the language for the `.s` (or the libraries code file extension) to `BitMagic X16 Asm`. You can do this by pressing `Ctrl+K M` and selecting `BitMagic X16 Asm` or use the language selection in the bottom right of the editor. Alternatively read more [here](https://code.visualstudio.com/docs/languages/overview#_language-identifier).
+
+![Breakpoints in ZSMKit](images/cc65breakpoint.gif)
+
 ## Usage
 
 To import a CC65 library, there is a `import` which ships with BitMagic called `cc65library.bmasm`.

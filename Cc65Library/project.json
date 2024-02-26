@@ -7,6 +7,6 @@
         "DisplaySegments": true,
         "BinFolder": "Bin",
         "DisplayVariables": false,
-        "Rebuild": true
+        "Rebuild": false
     }
 }
