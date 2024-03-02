@@ -1,0 +1,6 @@
+{
+    "Source": "src/main.bmasm",
+    "SdCardFiles" : [
+        "sdcard"
+    ]
+}
