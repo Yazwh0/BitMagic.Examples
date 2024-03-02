@@ -30,7 +30,7 @@ image.Mutate(i => i.Resize(320, 240).Quantize(new PaletteQuantizer(palette)));
 File.WriteAllBytes(@$"..\sdcard\{filename}", GetX16Image(image, palette));
 ```
 
-The default palette is stored in the int array, which we use a helper function to convert to a `Color` object which ImageSharp can use. A second helper function can then lookup a `Color` to find the index so we can create a binary file in the local folder `sdcard`.
+The default palette is stored in the int array `palette`. A helper function is then called to convert to a array of `Color` objects which ImageSharp can use. A second helper function can then lookup a `Color` to find the index to create a binary file in the local folder `sdcard`.
 
 In the `project.json` we set that folder to be imported onto the virtual SD Card within the emulator.
 
