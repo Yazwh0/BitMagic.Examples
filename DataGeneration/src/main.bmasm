@@ -1,0 +1,158 @@
+import BM="BM.bmasm";
+
+.machine CommanderX16R42
+
+    BM.X16Header();
+
+    sei
+
+    ; disable layer 1/0 and enable sprites
+    stz CTRL
+    lda DC_VIDEO
+    and #%00001111
+    ora #%01000000
+    sta DC_VIDEO
+
+    ; 320*240
+    lda #64
+    sta DC_HSCALE
+    sta DC_VSCALE
+
+    ; create one sprite at $00000
+    lda #$10
+    sta ADDRx_H
+    stz ADDRx_M
+    stz ADDRx_L
+
+    ; copy the sprite data into VRAM
+    ldx #0
+    ldy #8*8/2
+.loop:
+    lda sprite, x
+    sta DATA0
+    inx
+    dey
+    bne -loop
+
+    ; define the sprite
+    lda #$11
+    sta ADDRx_H
+    lda #$fc
+    sta ADDRx_M
+    stz ADDRx_L
+
+    stz DATA0       ; address
+    stz DATA0       ; address + 1bpp
+    stz DATA0       ; X
+    stz DATA0       ; X
+    stz DATA0       ; Y
+    stz DATA0       ; Y
+    lda #%00000100  ; depth
+    sta DATA0
+    stz DATA0       ; height, width and palette offset
+
+    ; set interrupts
+    lda #01
+    sta IEN
+
+.loop:
+    ; set data port to the first sprite's coordinates
+    lda #$11
+    sta ADDRx_H
+    lda #$fc
+    sta ADDRx_M
+    lda #$02
+    sta ADDRx_L    
+    
+    ; see if we're moving the sprite's X value this frame
+    lda xframecount
+    dec
+    bne +no_reset
+
+    ; load the value from the data table and put it in the X coordinates
+    ldx xpos
+    lda xdata_low, x
+    sta DATA0
+    lda xdata_high, x
+    sta DATA0
+
+    ; move the index position on, and reset the frame count
+    inx
+    stx xpos
+    lda #2
+    sta xframecount
+    jmp +done
+.no_reset:
+    ; if we dont, change the X value, store the count and read from DATA0 twice to move the port on
+    sta xframecount
+    lda DATA0
+    lda DATA0
+.done:
+
+    ; do the same with the Y value
+    lda yframecount
+    dec
+    bne +no_reset
+
+    ldx ypos
+    lda ydata, x
+    sta DATA0    
+    inx
+    stx ypos
+    lda #3
+.no_reset:
+    ; no need to read from DATA0 as we're done
+    sta yframecount
+
+    ; execution stop here and wait for an interrupt, in this case only VSYNC
+    wai
+
+    ; acknowledge interrupt
+    lda #01
+    sta ISR
+
+    jmp -loop
+
+
+.align $100
+.ydata:
+    BM.Bytes(GetYData());
+.xdata_low:
+    var xdata = GetXData().ToArray();
+    BM.LowBytes(xdata);
+.xdata_high:
+    BM.HighBytes(xdata);
+
+.var byte xpos = 0
+.var byte xframecount = 1
+.var byte ypos = 0
+.var byte yframecount = 1
+
+; simple 8x8 sprite
+.sprite:
+.byte $00, $11, $11, $00
+.byte $01, $11, $11, $10
+.byte $11, $11, $11, $11
+.byte $11, $11, $11, $11
+.byte $11, $11, $11, $11
+.byte $11, $11, $11, $11
+.byte $01, $11, $11, $10
+.byte $00, $11, $11, $00
+
+IEnumerable<byte> GetYData()
+{
+    // return data between 0 and 240-8.
+    for(var i = 0; i < 256; i++)
+    {
+        yield return (byte)((Math.Sin((i / 256.0) * 2.0 * Math.PI) + 1) * (240-8) * 0.5);
+    }
+}
+
+IEnumerable<ushort> GetXData()
+{
+    // return data between 0 and 320-8.
+    for(var i = 0; i < 256; i++)
+    {
+        yield return (ushort)((Math.Sin((i / 256.0) * 2.0 * Math.PI) + 1) * (320-8) * 0.5);
+    }
+}
