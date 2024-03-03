@@ -6,7 +6,7 @@ Most of these projects are 'ready to go', however some require a few steps to se
 
 This repository will need to be cloned from github with submodules. Use the following to do so:
 
-```
+```sh
 git clone --recurse-submodules https://github.com/Yazwh0/BitMagic.Examples.git
 ```
 
