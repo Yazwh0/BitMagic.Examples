@@ -10,7 +10,7 @@ This repository will need to be cloned from github with submodules. Use the foll
 git clone --recurse-submodules https://github.com/Yazwh0/BitMagic.Examples.git
 ```
 
-## [BitBench](BitBench/README.md)
+## [BitBench](https://github.com/Yazwh0/BitBench)
 
 BitBench is a proof of concept task switching and text based windowing system.
 
@@ -25,4 +25,3 @@ Shows how the C# 'macros' can be used to create lookup tables.
 ## [NuGet](NuGet/README.md)
 
 Uses the NuGet package manager to add functionality to the BitMagic project.
-
