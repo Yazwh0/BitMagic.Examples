@@ -1,3 +1,6 @@
 [submodule "Cc65Library/zsmkit"]
 	path = Cc65Library/zsmkit
 	url = https://github.com/mooinglemur/zsmkit.git
+[submodule "BitBench"]
+	path = BitBench
+	url = https://github.com/Yazwh0/BitBench.git
