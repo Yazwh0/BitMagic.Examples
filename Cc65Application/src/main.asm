@@ -1,4 +1,11 @@
 
+.macro macroexample
+
+lda #4
+lda #5
+
+.endmacro
+
 ; 10 SYS 2064
     .byte $0C, $08              ; $080C - pointer to next line of BASIC code
     .byte $0A, $00              ; 2-byte line number ($000A = 10)
@@ -16,8 +23,8 @@
     lda #1
     lda #2
     lda #3
+    macroexample
 
 loop:
     inc
     jmp loop
-
