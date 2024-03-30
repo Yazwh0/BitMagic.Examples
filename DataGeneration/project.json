@@ -1,3 +1,7 @@
 {
-    "source" : "src/main.bmasm"
+    "source" : "src/main.bmasm",
+    "autobootRun" : false,
+    "compileOptions" : {
+        "rebuild": false
+    }
 }

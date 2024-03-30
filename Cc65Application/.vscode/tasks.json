@@ -1,0 +1,36 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ca65",
+            "command": "ca65 -g -v --cpu 65c02 -g -t cx16 ./src/main.asm -l main.lst",
+            "type": "shell",
+            "args": [],
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "presentation": {
+                "reveal": "always"
+            },
+            "group": "build"
+        },
+        {
+            "label": "ld65",
+            "command": "ld65 -v -Ln main.sym -m main.map -o BUILD.PRG -C cx16-asm.local.cfg --lib c64.lib ./src/main.o",
+            "type": "shell",
+            "args": [],
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "presentation": {
+                "reveal": "always"
+            },
+            "group": "build",
+            "dependsOn": [ "ca65" ]
+        },
+        {
+            "label" : "Build",
+            "dependsOn" : [ "ld65" ]
+        }
+    ]
+}
