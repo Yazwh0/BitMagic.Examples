@@ -12,6 +12,8 @@ This is a simple example of how to build and debug an application, for a more co
 
 You will need a install of `cc65` installed on your machine, with `ca65` and `ld65` being in the path. Please see the `tasks.json` file to see how these are used.
 
+*Please note, this may not be the best practice for building applications using ca65. Its a quick example that people can get running without a large toolchain.*
+
 ## Extension Activation
 
 There is empty file `blank.bmasm` which is included to activate the BitMagic extension.
