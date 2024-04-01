@@ -25,3 +25,11 @@ Shows how the C# 'macros' can be used to create lookup tables.
 ## [NuGet](NuGet/README.md)
 
 Uses the NuGet package manager to add functionality to the BitMagic project.
+
+## [Ca65 Application](Ca65Application/readme.md)
+
+How to write a simple application written using `ca65` and debug it withing BitMagic
+
+## [Dream Tracker](Ca65Application/readme.md)
+
+Another example of a `ca65` application, this one considerably larger and more complex.
