@@ -3,9 +3,9 @@
     "directRun": false,
     "autobootRun" : false,
     "sdCardFiles": [
-        { "Source" : "dream-tracker\\SAMPLES", "Dest" : "SAMPLES" },
-        { "Source" : "dream-tracker\\SCR", "Dest" : "SCR" },
-        { "Source" : "dream-tracker\\SONGS", "Dest" : "SONGS" }
+        { "source" : "dream-tracker\\SAMPLES", "dest" : "SAMPLES" },
+        { "source" : "dream-tracker\\SCR", "dest" : "SCR" },
+        { "source" : "dream-tracker\\SONGS", "dest" : "SONGS" }
     ],
     "files" : [
         {
