@@ -1,8 +1,8 @@
 
 .macro macroexample
 
-lda #4
-lda #5
+    lda #4
+    lda #5
 
 .endmacro
 

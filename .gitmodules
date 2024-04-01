@@ -4,3 +4,6 @@
 [submodule "BitBench"]
 	path = BitBench
 	url = https://github.com/Yazwh0/BitBench.git
+[submodule "Ca65Dreamtracker/dream-tracker"]
+	path = Ca65Dreamtracker/dream-tracker
+	url = https://gitlab.com/m00dawg/dream-tracker.git
