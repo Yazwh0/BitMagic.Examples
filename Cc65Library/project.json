@@ -1,12 +1,12 @@
 {
     "source": "src\\main.bmasm",
     "sdCardFiles": [
-        "zsmkit\\demo\\SONG1.ZSM"
+       { "source": "zsmkit\\demo\\SONG1.ZSM" }
     ],
     "compileOptions": {
         "DisplaySegments": true,
         "BinFolder": "Bin",
         "DisplayVariables": false,
-        "Rebuild": false
+        "Rebuild": true
     }
 }

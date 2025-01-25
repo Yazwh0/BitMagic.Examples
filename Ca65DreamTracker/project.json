@@ -1,7 +1,8 @@
 {
     "source": "",
     "directRun": false,
-    "autobootRun" : false,
+    "autobootRun" : true,
+    "autobootFile" : "DT.PRG",
     "sdCardFiles": [
         { "source" : "dream-tracker\\SAMPLES", "dest" : "SAMPLES" },
         { "source" : "dream-tracker\\SCR", "dest" : "SCR" },
@@ -10,7 +11,7 @@
     "files" : [
         {
             "type": "cc65",
-            "filename" : "DREAMTRK.PRG",
+            "filename" : "DT.PRG",
             "objectFile" : "dreamtracker.o",
             "config" : "cx16.cfg",
             "sourcePath" : ".",
