@@ -1,23 +1,48 @@
 {
     "source": "",
     "directRun": false,
-    "autobootRun" : true,
-    "autobootFile" : "DT.PRG",
+    "autobootRun": true,
+    "autobootFile": "DT.PRG",
+    "sdCard": "dreamtracker.base.bin.gz",
     "sdCardFiles": [
-        { "source" : "dream-tracker\\SAMPLES", "dest" : "SAMPLES" },
-        { "source" : "dream-tracker\\SCR", "dest" : "SCR" },
-        { "source" : "dream-tracker\\SONGS", "dest" : "SONGS" }
+        {
+            "source": "dream-tracker\\SAMPLES",
+            "dest": "SAMPLES"
+        },
+        {
+            "source": "dream-tracker\\SCR",
+            "dest": "SCR"
+        },
+        {
+            "source": "dream-tracker\\SONGS",
+            "dest": "SONGS"
+        }
     ],
-    "files" : [
+    "sdCardOutput": "dreamtracker.bin.gz",
+    "sdCardFinalOutput": "dreamtracker.final.bin.gz",
+    "files": [
         {
             "type": "cc65",
-            "filename" : "DT.PRG",
-            "objectFile" : "dreamtracker.o",
-            "config" : "cx16.cfg",
-            "sourcePath" : ".",
-            "startAddress" : 2049,
-            "basePath" : "dream-tracker",
-            "includes" : [ "c:\\dev\\CC65\\lib\\cx16.lib" ]
+            "outputs": [
+                {
+                    "filename": "DT.PRG",
+                    "startAddress": 2049,
+                    "default": true,
+                    "hasHeader": true
+                },
+                {
+                    "filename": "DAT/*",
+                    "default": false,
+                    "hasHeader": false
+                }
+            ],
+            "objectFile": "dreamtracker.o",
+            "config": "cx16.cfg",
+            "sourcePath": ".",
+            "basePath": "dream-tracker",
+            "includes": [
+                "c:\\dev\\CC65\\lib\\cx16.lib"
+            ]
         }
     ]
 }
