@@ -1,0 +1,18 @@
+import BM="BM.bmasm";
+
+    BM.X16Header();
+    sei
+    cld
+
+    lda ROM_BANK
+    pha
+
+    lda #16
+    sta ROM_BANK
+    jsr $c000
+
+    pla
+    sta ROM_BANK
+
+    cli
+    rts

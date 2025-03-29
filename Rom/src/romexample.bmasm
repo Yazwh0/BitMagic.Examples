@@ -1,0 +1,8 @@
+.segment ROM, $c000, $4000, ROMEXAMPLE.BIN
+
+.0xc000_entry:
+    nop
+.breakpoint
+    nop
+
+    rts

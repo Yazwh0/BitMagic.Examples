@@ -1,0 +1,205 @@
+{
+    "files": [
+        {
+            "type": "bitmagic",
+            "filename": "src/test.bmasm"
+        },
+        {
+            "type": "bitmagic",
+            "filename": "src/romexample.bmasm"
+        },
+        {
+            "type": "cc65",
+            "outputs": [
+                {
+                    "filename": "kernal.bin",
+                    "referenceFile": "build/x16/kernal.bin",
+                    "startAddress": 49152,
+                    "hasHeader": false,
+                    "default": false
+                }
+            ],
+            "config": "cfg/kernal-x16.cfgtpl",
+            "objectFiles": [
+                "build/x16/kernal/declare.o",
+                "build/x16/kernal/vectors.o",
+                "build/x16/kernal/kbdbuf.o",
+                "build/x16/kernal/memory.o",
+                "build/x16/kernal/lzsa.o",
+                "build/x16/kernal/signature.o",
+                "build/x16/kernal/cbm/editor.o",
+                "build/x16/kernal/cbm/channel/channel.o",
+                "build/x16/kernal/cbm/init.o",
+                "build/x16/kernal/cbm/memory.o",
+                "build/x16/kernal/cbm/nmi.o",
+                "build/x16/kernal/cbm/irq.o",
+                "build/x16/kernal/cbm/util.o",
+                "build/x16/kernal/cbm/serial.o",
+                "build/x16/kernal/x16/extapi.o",
+                "build/x16/kernal/x16/65c816/interrupt.o",
+                "build/x16/kernal/x16/65c816/stack.o",
+                "build/x16/kernal/x16/65c816/extapi16.o",
+                "build/x16/kernal/drivers/x16/x16.o",
+                "build/x16/kernal/drivers/x16/memory.o",
+                "build/x16/kernal/drivers/x16/screen.o",
+                "build/x16/kernal/drivers/x16/ps2data.o",
+                "build/x16/kernal/drivers/x16/ps2kbd.o",
+                "build/x16/kernal/drivers/x16/ps2mouse.o",
+                "build/x16/kernal/drivers/x16/joystick.o",
+                "build/x16/kernal/drivers/x16/clock.o",
+                "build/x16/kernal/drivers/x16/framebuffer.o",
+                "build/x16/kernal/drivers/x16/sprites.o",
+                "build/x16/kernal/drivers/x16/entropy.o",
+                "build/x16/kernal/drivers/x16/beep.o",
+                "build/x16/kernal/drivers/x16/i2c.o",
+                "build/x16/kernal/drivers/x16/smc.o",
+                "build/x16/kernal/drivers/x16/rtc.o",
+                "build/x16/kernal/drivers/generic/softclock_timer.o",
+                "build/x16/kernal/graph/graph.o",
+                "build/x16/kernal/fonts/fonts.o",
+                "build/x16/kernal/graph/console.o",
+                "build/x16/kernal/ieee_switch.o"
+            ],
+            "sourcePath": "kernal",
+            "includes": [
+                "c:\\dev\\CC65\\lib\\cx16.lib",
+                "c:\\dev\\CC65\\asminc\\longbranch.mac"
+            ],
+            "basePath": "x16-rom",
+            "defaultOutputFile": "kernal.bin"
+        },
+        {
+            "type": "cc65",
+            "outputs": [
+                {
+                    "filename": "dos.bin",
+                    "referenceFile": "build/x16/dos.bin",
+                    "startAddress": 49152,
+                    "hasHeader": false,
+                    "default": false
+                }
+            ],
+            "config": "cfg/dos-x16.cfgtpl",
+            "objectFiles": [
+                "/build/x16/dos/declare.o",
+                "/build/x16/dos/zeropage.o",
+                "/build/x16/dos/jumptab.o",
+                "/build/x16/dos/main.o",
+                "/build/x16/dos/file.o",
+                "/build/x16/dos/cmdch.o",
+                "/build/x16/dos/dir.o",
+                "/build/x16/dos/parser.o",
+                "/build/x16/dos/functions.o",
+                "/build/x16/dos/djsrfar.o"
+            ],
+            "sourcePath": "dos",
+            "includes": [
+                "c:\\dev\\CC65\\lib\\cx16.lib",
+                "c:\\dev\\CC65\\asminc\\longbranch.mac"
+            ],
+            "basePath": "x16-rom",
+            "defaultOutputFile": "dos.bin"
+        },
+        {
+            "type": "cc65",
+            "outputs": [
+                {
+                    "filename": "fat32.bin",
+                    "referenceFile": "build/x16/fat32.bin",
+                    "startAddress": 49152,
+                    "hasHeader": false,
+                    "default": false
+                }
+            ],
+            "config": "cfg/fat32-x16.cfgtpl",
+            "objectFiles": [
+                "/build/x16/fat32/fat32.o",
+                "/build/x16/fat32/mkfs.o",
+                "/build/x16/fat32/sdcard.o",
+                "/build/x16/fat32/text_input.o",
+                "/build/x16/fat32/match.o",
+                "/build/x16/fat32/main.o"
+            ],
+            "sourcePath": "fat32",
+            "includes": [
+                "c:\\dev\\CC65\\lib\\cx16.lib",
+                "c:\\dev\\CC65\\asminc\\longbranch.mac"
+            ],
+            "basePath": "x16-rom",
+            "defaultOutputFile": "fat32.bin"
+        },
+        {
+            "type": "cc65",
+            "outputs": [
+                {
+                    "filename": "basic.bin",
+                    "referenceFile": "build/x16/basic.bin",
+                    "startAddress": 49152,
+                    "hasHeader": false,
+                    "default": false
+                }
+            ],
+            "config": "cfg/basic-x16.cfgtpl",
+            "objectFiles": [
+                "/build/x16/kernsup/kernsup_basic.o",
+                "/build/x16/basic/basic.o",
+                "/build/x16/math/math.o"
+            ],
+            "sourcePath": "basic",
+            "includes": [
+                "c:\\dev\\CC65\\lib\\cx16.lib",
+                "c:\\dev\\CC65\\asminc\\longbranch.mac"
+            ],
+            "basePath": "x16-rom",
+            "defaultOutputFile": "basic.bin"
+        }
+    ],
+    "outputFolder": "app",
+    "romSource": [
+        {
+            "filename": "app/kernal.bin",
+            "bank": 0,
+            "address": "0xc000"
+        },
+        {
+            "filename": "app/dos.bin",
+            "bank": 2,
+            "address": "0xc000"
+        },
+        {
+            "filename": "app/fat32.bin",
+            "bank": 3,
+            "address": "0xc000"
+        },
+        {
+            "filename": "app/basic.bin",
+            "bank": 4,
+            "address": "0xc000"
+        },
+        {
+            "filename": "app/ROMEXAMPLE.BIN",
+            "bank": 16,
+            "address": "0xc000"
+        }
+    ],
+    "romFile": "x16-rom/build/x16/rom.bin",
+    "romBankSymbols": [
+        "x16-rom/build/x16/kernal.sym",
+        "x16-rom/build/x16/keymap.sym",
+        "x16-rom/build/x16/dos.sym",
+        "x16-rom/build/x16/fat32.sym",
+        "x16-rom/build/x16/basic.sym",
+        "x16-rom/build/x16/fat32.sym",
+        "x16-rom/build/x16/monitor.sym",
+        "x16-rom/build/x16/charset.sym",
+        "x16-rom/build/x16/diag.sym",
+        "x16-rom/build/x16/demo.sym",
+        "x16-rom/build/x16/audio.sym",
+        "x16-rom/build/x16/util.sym",
+        "x16-rom/build/x16/bannex.sym",
+        " ",
+        " ",
+        " "
+    ],
+    "autobootRun": false
+}

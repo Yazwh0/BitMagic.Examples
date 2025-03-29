@@ -7,3 +7,6 @@
 [submodule "Ca65DreamTracker/dream-tracker"]
 	path = Ca65DreamTracker/dream-tracker
 	url = https://gitlab.com/m00dawg/dream-tracker.git
+[submodule "Rom/x16-rom"]
+	path = Rom/x16-rom
+	url = https://github.com/X16Community/x16-rom.git
