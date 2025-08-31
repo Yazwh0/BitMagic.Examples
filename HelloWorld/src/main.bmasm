@@ -1,0 +1,111 @@
+import BM="bm.bmasm";
+
+const string hello_world_string = "HELLO WORLD!\r\n";
+
+BM.X16Header();
+
+.proc main
+
+	nop
+
+	jsr bsout_indexed
+	jsr bsout_selfmodifying
+	jsr bsout_indexed_macro
+	jsr bsout_unrolled
+	jsr primm
+
+.:	jmp -
+
+.endproc
+
+; Standard indexed output
+.proc bsout_indexed
+
+	ldx #0
+
+.loop:
+	lda hello_world, x
+	beq done
+	jsr BSOUT
+	inx
+	jmp loop
+
+.done:
+	rts
+
+.endproc
+
+; Use self modifying code. Not optimal, but demonstraits how to define a label within a instruction.
+; Also demonstraits how to use anonymous labels.
+.proc bsout_selfmodifying
+
+	lda #<hello_world
+	sta read_address
+
+	lda #>hello_world
+	sta read_address + 1
+
+.:	lda read_address: $1234
+	beq +
+	jsr BSOUT
+	inc read_address
+	bne -
+	inc read_address + 1
+	jmp -
+
+.:	rts
+
+.endproc
+
+; Use c# to return the length of the string, so no need for null termination.
+.proc bsout_indexed_macro
+
+	ldx #@(hello_world_string.Length)
+	ldy #0
+
+.:	lda hello_world, y
+	jsr BSOUT
+	iny
+	dex
+	bne -
+
+	rts
+
+.endproc
+
+; Use a unrolled loop to call BSOUT for each character.
+.proc bsout_unrolled
+
+	var toDisplay = BM.StringToPetscii(hello_world_string).ToArray();
+
+	for(var i = 0; i < toDisplay.Length; i++)
+	{
+		lda #@(toDisplay[i])
+		jsr BSOUT
+	}
+
+	rts
+
+.endproc
+
+; use PRIMM to output the string. This requires the string to be within the code and returns to the instruction after it.
+.proc primm
+
+	lda ROM_BANK
+	pha
+
+	stz ROM_BANK ; set rombank to the kernal
+
+	jsr PRIMM
+	BM.Bytes(BM.StringToPetscii(hello_world_string));
+
+	pla
+	sta ROM_BANK
+
+	rts
+
+.endproc
+
+
+.hello_world:
+	BM.Bytes(BM.StringToPetscii(hello_world_string)); // by default this is null terminated

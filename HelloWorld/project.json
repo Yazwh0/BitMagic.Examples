@@ -1,0 +1,17 @@
+{
+  "files": [
+    {
+      "type": "bitmagic",
+      "filename": "src/main.bmasm"
+    }
+  ],
+  "outputFolder": "app",
+  "memoryFillValue": 123,
+  "windowScale": 2,
+  "compileOptions": {
+    "binFolder": "bin",
+    "displaySegments": true,
+    "saveGeneratedBmasm": true
+  },
+  "sdCardFiles": []
+}
