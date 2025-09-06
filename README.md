@@ -10,6 +10,14 @@ This repository will need to be cloned from github with submodules. Use the foll
 git clone --recurse-submodules https://github.com/Yazwh0/BitMagic.Examples.git
 ```
 
+## [Hello World](HelloWorld/README.md)
+
+Over engineered Hello World!
+
+## [FX Cache](FX/Cache/README.md)
+
+An example of how to use the FX Cache.
+
 ## [BitBench](https://github.com/Yazwh0/BitBench)
 
 BitBench is a proof of concept task switching and text based windowing system.
