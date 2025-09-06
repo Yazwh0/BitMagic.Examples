@@ -1,0 +1,86 @@
+import BM="bm.bmasm";
+
+BM.X16Header();
+	nop
+
+	jsr setup_testdata
+	jsr cache_read_write
+
+.breakpoint
+.loop:
+	jmp -loop
+
+.proc cache_read_write
+
+	; initialise FX
+
+	lda #2 << 1
+	sta CTRL
+
+	lda #%01100000 	; Cache fill and cache write
+	sta FX_CTRL
+
+	stz FX_MULT		; set byte and nibble index to 0
+
+	lda #1
+	sta CTRL
+
+	lda #$30		; 4 byte steps
+	sta ADDRx_H
+	lda #$10
+	sta ADDRx_M
+	stz ADDRx_L
+
+	stz CTRL
+
+	lda #$10		; 1 byte steps
+	sta ADDRx_H
+	stz ADDRx_M
+	stz ADDRx_L
+
+	; copy from DATA0 -> DATA1
+	; eg $0000 -> $1000
+
+	ldd DATA0	; fill cache
+	ldd DATA0
+	ldd DATA0
+	ldd DATA0
+
+	; open the VRAM viewer at $1000, and every write to DATA1 will write 4 bytes
+	; you can see the cache by opening up VERA FX in the variables window
+	.breakpoint
+
+	stz DATA1	; write cache all data
+	stz DATA1
+
+	lda #$f0    ; set mask. set bits dont write the representitive nibble
+	sta DATA1	; write first two bytes, but not the second
+	sta DATA1
+
+	rts
+
+.endproc
+
+.proc setup_testdata
+
+	stz CTRL
+
+	lda #$10
+	sta ADDRx_H
+	stz ADDRx_M
+	stz ADDRx_L
+
+	lda #1
+	sta DATA0
+	inc
+	sta DATA0
+	inc
+	sta DATA0
+	inc
+	sta DATA0
+
+	stz ADDRx_L
+
+	rts
+
+.endproc
