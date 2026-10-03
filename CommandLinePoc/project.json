@@ -13,8 +13,7 @@
   "compileOptions": {
     "binFolder": "bin",
     "displaySegments": true,
-    "saveGeneratedBmasm": true,
-    "rebuild": true
+    "saveGeneratedBmasm": true
   },
   "sdCardFiles": [
     {
