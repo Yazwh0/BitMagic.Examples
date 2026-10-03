@@ -4,20 +4,30 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Make in WSL",
+            // Same as Dream Tracker's Makefile, plus the debug information BitMagic needs. cl65 only applies options
+            // to the files after them, so -g must come before dreamtracker.asm. The debug file is written outside the
+            // dream-tracker folder so it doesn't show as a change in that repository.
+            "label": "Build",
             "type": "shell",
-            "command": "bash",
-            "options":
-            {
+            "command": "cl65",
+            "options": {
                 "cwd": "${workspaceFolder}/dream-tracker"
             },
-            "args" : [
-                "-c",
-                "make"
+            "args": [
+                "-g",
+                "-t", "cx16",
+                "-C", "cx16.cfg",
+                "-o", "DT.PRG",
+                "-l", "dreamtracker.list",
+                "-Ln", "dreamtracker.sym",
+                "-m", "dreamtracker.map",
+                "-Wl", "--dbgfile,../dreamtracker.dbg",
+                "dreamtracker.asm"
             ],
             "problemMatcher": [
                 "$gcc"
-            ]
+            ],
+            "group": "build"
         }
     ]
 }

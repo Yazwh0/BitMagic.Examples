@@ -11,7 +11,8 @@
             "program": "${workspaceFolder}/project.json",
             "stopOnEntry": true,
             "debugArgs": [],
-            "cwd": "${workspaceRoot}"
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build"
         }
     ]
 }

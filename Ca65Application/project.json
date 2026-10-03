@@ -1,15 +1,23 @@
 {
     "source": "",
     "directRun": false,
-    "autobootRun" : false,
-    "files" : [
+    "autobootRun": true,
+    "autobootFile": "BUILD.PRG",
+    "files": [
         {
             "type": "cc65",
-            "filename" : "BUILD.PRG",
-            "objectFile" : "src\\main.o",
-            "config" : "cx16-asm.local.cfg",
-            "sourcePath" : "src",
-            "startAddress" : 2049
+            "outputs": [
+                {
+                    "filename": "BUILD.PRG",
+                    "default": true,
+                    "hasHeader": true
+                }
+            ],
+            "debugFile": "main.dbg",
+            "objectFiles": [
+                "src/main.o"
+            ],
+            "basePath": "."
         }
     ]
 }

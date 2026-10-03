@@ -6,15 +6,15 @@
     "sdCard": "dreamtracker.base.bin.gz",
     "sdCardFiles": [
         {
-            "source": "dream-tracker\\SAMPLES",
+            "source": "dream-tracker/SAMPLES",
             "dest": "SAMPLES"
         },
         {
-            "source": "dream-tracker\\SCR",
+            "source": "dream-tracker/SCR",
             "dest": "SCR"
         },
         {
-            "source": "dream-tracker\\SONGS",
+            "source": "dream-tracker/SONGS",
             "dest": "SONGS"
         }
     ],
@@ -26,23 +26,16 @@
             "outputs": [
                 {
                     "filename": "DT.PRG",
-                    "startAddress": 2049,
                     "default": true,
                     "hasHeader": true
                 },
                 {
                     "filename": "DAT/*",
-                    "default": false,
                     "hasHeader": false
                 }
             ],
-            "objectFile": "dreamtracker.o",
-            "config": "cx16.cfg",
-            "sourcePath": ".",
-            "basePath": "dream-tracker",
-            "includes": [
-                "c:\\dev\\CC65\\lib\\cx16.lib"
-            ]
+            "debugFile": "../dreamtracker.dbg",
+            "basePath": "dream-tracker"
         }
     ]
 }

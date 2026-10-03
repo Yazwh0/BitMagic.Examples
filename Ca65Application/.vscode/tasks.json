@@ -16,7 +16,7 @@
         },
         {
             "label": "ld65",
-            "command": "ld65 -v -Ln main.sym -m main.map -o BUILD.PRG -C cx16-asm.local.cfg --lib c64.lib ./src/main.o",
+            "command": "ld65 -v -Ln main.sym -m main.map --dbgfile main.dbg -o BUILD.PRG -C cx16-asm.local.cfg --lib c64.lib ./src/main.o",
             "type": "shell",
             "args": [],
             "problemMatcher": [

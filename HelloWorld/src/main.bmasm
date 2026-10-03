@@ -14,7 +14,8 @@ BM.X16Header();
 	jsr bsout_unrolled
 	jsr primm
 
-.:	jmp -
+.loop:
+	jmp loop
 
 .endproc
 

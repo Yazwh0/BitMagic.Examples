@@ -7,11 +7,13 @@
   ],
   "outputFolder": "app",
   "memoryFillValue": 123,
+  "autobootRun": true,
   "windowScale": 2,
   "compileOptions": {
     "binFolder": "bin",
     "displaySegments": true,
-    "saveGeneratedBmasm": true
-  },
-  "sdCardFiles": []
+    "saveGeneratedBmasm": true,
+    "saveGeneratedTemplate": true,
+    "rebuild": false
+  }
 }
