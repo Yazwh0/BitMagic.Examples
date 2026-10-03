@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "type": "bitmagic",
+      "filename": "src/cat.bmasm",
+      "outputFilename": "CAT"
+    }
+  ],
+  "outputFolder": "app",
+  "memoryFillValue": 192,
+  "windowScale": 2,
+  "autobootRun": false,
+  "compileOptions": {
+    "binFolder": "bin",
+    "displaySegments": true,
+    "saveGeneratedBmasm": true,
+    "rebuild": true
+  },
+  "sdCardFiles": [
+    {
+      "source": "*.txt"
+    }
+  ]
+}

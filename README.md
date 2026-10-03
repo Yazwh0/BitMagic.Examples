@@ -38,6 +38,10 @@ Uses the NuGet package manager to add functionality to the BitMagic project.
 
 How to write a simple application written using `ca65` and debug it withing BitMagic
 
+## [Command Line POC](CommandlinePoc/README.md)
+
+A proof of concept for passing command line parameters to a machine code program, demonstrated with a simple `cat`.
+
 ## [Dream Tracker](Ca65Application/readme.md)
 
 Another example of a `ca65` application, this one considerably larger and more complex.

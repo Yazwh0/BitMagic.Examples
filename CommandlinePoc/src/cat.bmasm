@@ -1,0 +1,76 @@
+import BM="bm.bmasm";
+
+BM.X16Header();
+    nop
+
+    .const startAddress = 0x200 + 3;
+
+    ; start here, and look for `"`
+    ldx #0
+.loop:
+    inx						; will skip bad character
+    beq overflow
+    lda startAddress, x
+    cmp #'"'
+    bne -loop
+
+.loop:
+    inx
+    beq overflow
+    lda startAddress, x
+    cmp #' '				; space
+    beq -loop
+
+    ; we're now at the start of the parameters
+    ldy #0
+.loop:
+    lda startAddress, x
+    sta buffer, y
+    beq +done
+    inx
+    iny
+    cpy #128
+    beq overflow
+    jmp -loop
+
+.done:
+    phy                     ; length of the string
+    lda #3
+    ldx #8
+    ldy #2
+    jsr SETLFS
+
+    pla                     ; pull has the length of the string
+    ldx #<buffer
+    ldy #>buffer
+    jsr SETNAM
+
+    jsr OPEN
+    bcs file_error
+
+    ldx #3
+    jsr CHKIN
+    bcs file_error
+
+.read_loop:
+    jsr CHRIN
+    jsr CHROUT
+
+    jsr READST
+    beq read_loop	        ; any status bit (EOF or error) ends the read
+
+.all_done:
+    jsr CLRCHN
+
+    lda #3
+    jsr CLOSE
+
+    rts
+
+; no error handling here. this is just a POC.
+.file_error:
+.overflow:
+    .exception
+    brk
+
+.padvar string[128] buffer
