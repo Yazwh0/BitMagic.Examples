@@ -1,29 +1,63 @@
 # Data Generation
 
-This project demonstrates how BitMagic can be used to generate data, in this case a set of Sin tables.
+Uses C# to generate sine tables at compile time, then uses them to move an 8x8 sprite around the screen. There's no data file and no table typed out by hand: the values are calculated while the program is built.
 
-The sin tables are created to move a 8x8 sprite around the screen.
+## How to run it
 
-The tables will be 256 entries long, so make it easier to index into.
+Open the folder in VSCode and press `F5`. A sprite moves around the screen in a loop.
 
-For the X axis these will have to be between 0 and 320 - 8. We minus 8 so the sprite doesn't move off the screen. As the value range is above 255, these values will need to be 16bit.
+## Planning the tables
 
-To speed up reading the X axis values, these 16bit numbers will be split into a low and high value table.
+Each table has 256 entries, so an 8 bit index wraps around on its own.
 
-The Y axis is simpler, values between 0 and 240 - 8 are required, so a 8bit table can be used.
+- **X** needs values from 0 to 320 - 8, so the sprite doesn't move off the screen. That's more than a byte, so the values are 16 bit. To keep reading them fast, they're split into a table of low bytes and a table of high bytes.
+- **Y** needs values from 0 to 240 - 8, so a single table of bytes is enough.
 
-## Sin Tables
+## Generating the tables
 
-The sin tables are generated at the end of the program.
+Two C# methods at the end of `src/main.bmasm` return the values:
 
-There are two functions `GetYData()` and `GetXData()` which generate the 256 entry long values. The output of which is then passed into a library function `BM.Bytes`, `BM.LowBytes` or `BM.HighBytes` which creates a data block depending on the function.
+```bmasm
+IEnumerable<byte> GetYData()
+{
+    // return data between 0 and 240-8.
+    for(var i = 0; i < 256; i++)
+    {
+        yield return (byte)((Math.Sin((i / 256.0) * 2.0 * Math.PI) + 1) * (240-8) * 0.5);
+    }
+}
+```
 
-Before these blocks are defined there is a `.align $100` to make sure that the start aligns to a memory block so when we use `lda ydata, x` there is no cycle penalty for going across a memory bank.
+`GetXData()` is the same, but returns `ushort` values between 0 and 320 - 8.
+
+Their output is passed to the BM library, which writes the data: `BM.Bytes` for the Y table, and `BM.LowBytes` and `BM.HighBytes` to split the X values.
+
+```bmasm
+.align $100
+.ydata:
+    BM.Bytes(GetYData());
+.xdata_low:
+    var xdata = GetXData().ToArray();
+    BM.LowBytes(xdata);
+.xdata_high:
+    BM.HighBytes(xdata);
+```
+
+The `.align $100` puts the tables on a page boundary, so `lda ydata, x` never crosses a page and never takes the extra cycle.
 
 ## Variables
 
-After the data there are 4 variables defined using `.var`. This keyword allocates the space for the data type and initialises the value by storing it inside the file from the segment. `.var` cannot be used inside segments that do not produce a file, `.padvar` should be used instead but without the initial value.)
+After the data, four variables are defined with `.var`:
 
-The benefit of defined a variable and its type (either using `.var`, `.constvar` or `.padvar`) is that these values are visible in the variables section within VSCode while debugging. They appear under the `Locals` entry near the bottom.
+```bmasm
+.var byte xpos = 0
+.var byte xframecount = 1
+.var byte ypos = 0
+.var byte yframecount = 1
+```
+
+`.var` reserves the space and stores the initial value in the output file, so it can only be used in a segment that writes a file. In one that doesn't, use `.padvar`, which reserves the space without a value.
+
+Giving a variable a type (with `.var`, `.constvar` or `.padvar`) means the debugger knows how to show it. They appear under *Locals* in the variables view in VSCode while you're debugging.
 
 ![Locals](images/locals.png)

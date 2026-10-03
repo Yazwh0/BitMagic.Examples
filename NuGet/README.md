@@ -1,37 +1,44 @@
 # NuGet
 
-This project demonstrates how to use the NuGet package manager within a BitMagic project.
+How to use a NuGet package in a BitMagic project. The example uses [ImageSharp](https://sixlabors.com/products/imagesharp/) to convert an image to the X16 palette while the program is built, then displays it.
+
+## How to run it
+
+Open the folder in VSCode and press `F5`. The build converts `assets/m65.png` and writes it to the SD card, and the program loads it into VRAM as a 320x240 bitmap. You'll need an internet connection the first time, so BitMagic can download the package.
 
 ## Referencing a NuGet package
 
-The project references the NuGet project on the first line of the `main.bmasm` file. Note, NuGet references do not need to be at the top of the file, however it is a good place for them.
+The first line of `src/main.bmasm` references the package:
 
-Consider the following;
-
-``` C#
+```bmasm
 nuget SixLabors.ImageSharp, 3.0.2;
 ```
 
-This instructs BitMagic to download `SixLabors.ImageSharp` version 3.0.2 from the NuGet repository, and places the dlls in the binary folder along with the other binaries that are produced by the build process. It will also load the assembly into memory so it needs no further references within the code.
+This downloads version 3.0.2 of `SixLabors.ImageSharp` from NuGet and puts its DLLs in the `bin` folder with the rest of the build output. It also loads the assembly, so there's nothing else to reference. Leave out the version number to use the latest one.
 
-Your code will still need to include `using` declarations.
+The reference doesn't have to be on the first line, but the top of the file is a good place for it. Your code will still need `using` statements:
 
-If the version number is omitted then the latest version will be used.
-
-## How the example works
-
-The example code will use [ImageSharp](https://sixlabors.com/products/imagesharp/) to take an arbitrary image, resize it to 320x240, and reduce the palette to that of the Commander X16.
-
-This is achieved by these lines near the start of the file:
-
-``` C#
-var image = Image.Load<Rgba32>(@"..\assets\m65.png");
-image.Mutate(i => i.Resize(320, 240).Quantize(new PaletteQuantizer(palette)));
-File.WriteAllBytes(@$"..\sdcard\{filename}", GetX16Image(image, palette));
+```bmasm
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Processing.Processors.Quantization;
+using SixLabors.ImageSharp.PixelFormats;
 ```
 
-The default palette is stored in the int array `palette`. A helper function is then called to convert to a array of `Color` objects which ImageSharp can use. A second helper function can then lookup a `Color` to find the index to create a binary file in the local folder `sdcard`.
+## Converting the image
 
-In the `project.json` we set that folder to be imported onto the virtual SD Card within the emulator.
+These lines near the start of the file load the image, resize it to 320x240, reduce it to the X16's default palette and write the result as a binary file:
 
-The rest of the `main.bmasm` file then sets up the display so that layer 0 is a 8bpp bitmap where the base address is at $00000 in VRAM. We then use [MACPTR](https://github.com/X16Community/x16-docs/blob/master/X16%20Reference%20-%2005%20-%20KERNAL.md#function-name-macptr) to load the binary data into VRAM via `DATA0`.
+```bmasm
+    var image = Image.Load<Rgba32>(@"..\assets\m65.png");
+    image.Mutate(i => i.Resize(320, 240).Quantize(new PaletteQuantizer(palette)));
+    File.WriteAllBytes(@$"..\sdcard\{filename}", GetX16Image(image, palette));
+```
+
+The default palette is the `int` array `colours`. One helper method turns it into the `Color` objects ImageSharp needs. A second looks up each pixel's `Color` to find its palette index, which gives one byte per pixel.
+
+`project.json` adds the `sdcard` folder to the emulator's SD card, so the program can load the file.
+
+## Displaying it
+
+The rest of `src/main.bmasm` sets layer 0 to an 8bpp bitmap at `$00000` in VRAM, then uses the kernal's [MACPTR](https://github.com/X16Community/x16-docs/blob/master/X16%20Reference%20-%2005%20-%20KERNAL.md#function-name-macptr) to load the file straight into VRAM through `DATA0`.

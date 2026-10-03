@@ -1,37 +1,80 @@
-# ROM Building and Debugging
+# ROM
 
-This example shows how to write ROM code using BitMagic and debug the official ROM from the X16 Community.
+How to write your own ROM code with BitMagic, and how to debug the official [X16Community ROM](https://github.com/X16Community/x16-rom) with full source.
 
-## Writing ROM Code
+## Writing ROM code
 
-To write ROM code using BitMagic is as simple as defining the segment to start within ROM and be outputted to its own file.
+To write ROM code, define a segment that starts in the ROM window and writes to its own file. This defines a segment called `ROM` at `$c000`, up to `$4000` bytes long, written to `ROMEXAMPLE.BIN`:
 
-For example this defines a ROM segment called `ROM` starting at 0xc000, with a maximum length of 0x4000 to a file called 'ROMEXAMPLE.BIN'.
+```bmasm
+.segment ROM, $c000, $4000, ROMEXAMPLE.BIN
 
-To load that into the ROM we need to BitMagic where in ROM the file is. this is done using the `romSource` objects in `project.json, for example this will load our example into bank 16.
+.0xc000_entry:
+    nop
+.breakpoint
+    nop
 
-```json
-    "romSource": [
-        {
-            "filename": "app/ROMEXAMPLE.BIN",
-            "bank": 16,
-            "address": "0xc000"
-        }
-    ],
+    rts
 ```
 
-A very basic example and application to call into the test ROM is included.
+To tell the emulator where that file goes, add it to `romSource` in `project.json`. This puts it in ROM bank 16:
 
-## Debugging the Community X16 ROM
+```json
+"romSource": [
+    {
+        "filename": "app/ROMEXAMPLE.BIN",
+        "bank": 16,
+        "address": "0xc000"
+    }
+]
+```
 
-Included in this example is a git 'submodule' for the community X16 ROM. To ensure this is brought in correctly use the `--include-submodules` option when cloning this repository.
+`src/test.bmasm` is a small program that switches to bank 16 and calls `$c000`, so you can step from your program into the ROM code:
 
-There is no extensions within this project to build the ROM, so you will need to do that before starting the debugging session.
+```bmasm
+    lda ROM_BANK
+    pha
 
-### CC65
+    lda #16
+    sta ROM_BANK
+    jsr $c000
 
-Debugging the ROM is defined in two parts. How the individual parts of the ROM are built, which is defined within config files that CC65 uses to build and link the ROM. We need to mirror what the Makefile does within the `files` array within `project.json`.
+    pla
+    sta ROM_BANK
+```
 
-The files which are generated must then be added to the ROM like the BitMagic example so the debugger knows which files are where within ROM.
+## Debugging the X16Community ROM
 
-If you are debugging the ROM, be sure to always use the `rom.bin` that is built and not the default one to avoid conflicts.
+The ROM source is included as the `x16-rom` submodule, so clone with `--recurse-submodules`. BitMagic doesn't build the ROM, so build it with its own `Makefile` (which needs cc65) before you start debugging.
+
+The ROM is made of several parts, each built from its own cc65 config and object files. Each part is a `cc65` entry in the `files` array of `project.json`, mirroring what the `Makefile` does. For example, the kernal:
+
+```json
+{
+    "type": "cc65",
+    "outputs": [
+        {
+            "filename": "kernal.bin",
+            "referenceFile": "build/x16/kernal.bin",
+            "startAddress": 49152,
+            "hasHeader": false,
+            "default": false
+        }
+    ],
+    "config": "cfg/kernal-x16.cfgtpl",
+    "objectFiles": [
+        "build/x16/kernal/declare.o",
+        "build/x16/kernal/vectors.o",
+        "..."
+    ],
+    "sourcePath": "kernal",
+    "basePath": "x16-rom",
+    "defaultOutputFile": "kernal.bin"
+}
+```
+
+The example has entries for the kernal, DOS, FAT32 and BASIC. Like the BitMagic example, each output is then added to `romSource` with its bank, so the debugger knows which file is where. `romBankSymbols` loads the symbols for the other banks.
+
+Note: the `includes` in each entry point at `c:\dev\CC65`. Change them to match your cc65 install.
+
+When debugging the ROM, `romFile` must point at the `rom.bin` you built (`x16-rom/build/x16/rom.bin`), not the default one, otherwise the source won't match what's running.

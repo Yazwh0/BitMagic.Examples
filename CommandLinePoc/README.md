@@ -1,30 +1,51 @@
 # Command Line POC
 
-A proof of concept showing how a machine code program on the X16 can read parameters passed to it on the BASIC command line, much like a command line tool on a modern OS.
+A proof of concept for passing parameters to a machine code program from the BASIC prompt, much like a command line tool on a modern OS. The example is a minimal `cat`: give it a filename and it prints that file from the SD card.
 
-The example is a minimal `cat`: it takes a filename as a parameter, opens that file on the SD card and prints its contents to the screen.
+## How to run it
 
-## How it works
+Open the folder in VSCode and press `F5`. This builds `src/cat.bmasm` to `app/CAT` and puts it on the SD card with `bit.txt` and `magic.txt`. At the BASIC prompt, type:
 
-When a command is typed at the BASIC prompt it is held in the input buffer at `$0200`. Loading and running a program with the `^` wedge leaves that buffer intact, so the program can read the rest of the line itself.
-
-`src/cat.bmasm`:
-
-1. Scans the input buffer for the closing `"` after the program name.
-2. Skips any spaces to find the start of the parameter, then copies it into `buffer`.
-3. Uses the parameter as the filename for `SETNAM`, then `OPEN`s it on device 8.
-4. Reads the file with `CHRIN` and writes each character with `CHROUT` until `READST` reports end of file.
-5. Closes the file and returns to BASIC.
-
-There is no error handling: a missing file or an over long parameter raises an exception in the debugger via `.exception`.
-
-## Running it
-
-1. Open this folder in VSCode and start the **Debug Application** launch configuration. This compiles `src/cat.bmasm` to `app/CAT` and puts it, together with `bit.txt` and `magic.txt`, onto the SD card image.
-2. At the BASIC prompt type:
-
-```
+```text
 ^CAT" BIT.TXT
 ```
 
-The contents of `bit.txt` will be printed. Try `^CAT" MAGIC.TXT` to show the other file.
+The contents of `bit.txt` are printed. Try `^CAT" MAGIC.TXT` to show the other file.
+
+## How it works
+
+A line typed at the BASIC prompt is held in the input buffer at `$0200`. Loading and running a program with the `^` wedge leaves that buffer alone, so the program can read the rest of the line itself.
+
+First it scans the buffer for the `"` that closes the program name:
+
+```bmasm
+    .const startAddress = 0x200 + 3;
+
+    ldx #0
+.loop:
+    inx
+    beq overflow
+    lda startAddress, x
+    cmp #'"'
+    bne -loop
+```
+
+Then it skips any spaces and copies the rest of the line into `buffer`, up to the null at the end of the line. Its length is the `y` register, which is pushed for later.
+
+The parameter is then used as the filename:
+
+1. `SETLFS` and `SETNAM` set up logical file 3 on device 8 with the filename from `buffer`, and `OPEN` opens it.
+2. `CHKIN` makes it the input channel.
+3. A loop reads each character with `CHRIN` and prints it with `CHROUT`, until `READST` reports the end of the file.
+4. `CLRCHN` and `CLOSE` tidy up, and the program returns to BASIC.
+
+```bmasm
+.read_loop:
+    jsr CHRIN
+    jsr CHROUT
+
+    jsr READST
+    beq read_loop       ; any status bit (EOF or error) ends the read
+```
+
+As a proof of concept there's no error handling. A missing file or a parameter longer than 128 bytes stops at a `.exception` in the debugger.
