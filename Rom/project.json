@@ -12,14 +12,11 @@
             "type": "cc65",
             "outputs": [
                 {
-                    "filename": "kernal.bin",
-                    "referenceFile": "build/x16/kernal.bin",
-                    "startAddress": 49152,
-                    "hasHeader": false,
-                    "default": false
+                    "filename": "build/x16/kernal.bin",
+                    "hasHeader": false
                 }
             ],
-            "config": "cfg/kernal-x16.cfgtpl",
+            "debugFile": "build/x16/kernal.dbg",
             "objectFiles": [
                 "build/x16/kernal/declare.o",
                 "build/x16/kernal/vectors.o",
@@ -65,114 +62,101 @@
                 "c:\\dev\\CC65\\lib\\cx16.lib",
                 "c:\\dev\\CC65\\asminc\\longbranch.mac"
             ],
-            "basePath": "x16-rom",
-            "defaultOutputFile": "kernal.bin"
+            "basePath": "x16-rom"
         },
         {
             "type": "cc65",
             "outputs": [
                 {
-                    "filename": "dos.bin",
-                    "referenceFile": "build/x16/dos.bin",
-                    "startAddress": 49152,
-                    "hasHeader": false,
-                    "default": false
+                    "filename": "build/x16/dos.bin",
+                    "hasHeader": false
                 }
             ],
-            "config": "cfg/dos-x16.cfgtpl",
+            "debugFile": "build/x16/dos.dbg",
             "objectFiles": [
-                "/build/x16/dos/declare.o",
-                "/build/x16/dos/zeropage.o",
-                "/build/x16/dos/jumptab.o",
-                "/build/x16/dos/main.o",
-                "/build/x16/dos/file.o",
-                "/build/x16/dos/cmdch.o",
-                "/build/x16/dos/dir.o",
-                "/build/x16/dos/parser.o",
-                "/build/x16/dos/functions.o",
-                "/build/x16/dos/djsrfar.o"
+                "build/x16/dos/declare.o",
+                "build/x16/dos/zeropage.o",
+                "build/x16/dos/jumptab.o",
+                "build/x16/dos/main.o",
+                "build/x16/dos/file.o",
+                "build/x16/dos/cmdch.o",
+                "build/x16/dos/dir.o",
+                "build/x16/dos/parser.o",
+                "build/x16/dos/functions.o",
+                "build/x16/dos/djsrfar.o"
             ],
             "sourcePath": "dos",
             "includes": [
                 "c:\\dev\\CC65\\lib\\cx16.lib",
                 "c:\\dev\\CC65\\asminc\\longbranch.mac"
             ],
-            "basePath": "x16-rom",
-            "defaultOutputFile": "dos.bin"
+            "basePath": "x16-rom"
         },
         {
             "type": "cc65",
             "outputs": [
                 {
-                    "filename": "fat32.bin",
-                    "referenceFile": "build/x16/fat32.bin",
-                    "startAddress": 49152,
-                    "hasHeader": false,
-                    "default": false
+                    "filename": "build/x16/fat32.bin",
+                    "hasHeader": false
                 }
             ],
-            "config": "cfg/fat32-x16.cfgtpl",
+            "debugFile": "build/x16/fat32.dbg",
             "objectFiles": [
-                "/build/x16/fat32/fat32.o",
-                "/build/x16/fat32/mkfs.o",
-                "/build/x16/fat32/sdcard.o",
-                "/build/x16/fat32/text_input.o",
-                "/build/x16/fat32/match.o",
-                "/build/x16/fat32/main.o"
+                "build/x16/fat32/fat32.o",
+                "build/x16/fat32/mkfs.o",
+                "build/x16/fat32/sdcard.o",
+                "build/x16/fat32/text_input.o",
+                "build/x16/fat32/match.o",
+                "build/x16/fat32/main.o"
             ],
             "sourcePath": "fat32",
             "includes": [
                 "c:\\dev\\CC65\\lib\\cx16.lib",
                 "c:\\dev\\CC65\\asminc\\longbranch.mac"
             ],
-            "basePath": "x16-rom",
-            "defaultOutputFile": "fat32.bin"
+            "basePath": "x16-rom"
         },
         {
             "type": "cc65",
             "outputs": [
                 {
-                    "filename": "basic.bin",
-                    "referenceFile": "build/x16/basic.bin",
-                    "startAddress": 49152,
-                    "hasHeader": false,
-                    "default": false
+                    "filename": "build/x16/basic.bin",
+                    "hasHeader": false
                 }
             ],
-            "config": "cfg/basic-x16.cfgtpl",
+            "debugFile": "build/x16/basic.dbg",
             "objectFiles": [
-                "/build/x16/kernsup/kernsup_basic.o",
-                "/build/x16/basic/basic.o",
-                "/build/x16/math/math.o"
+                "build/x16/kernsup/kernsup_basic.o",
+                "build/x16/basic/basic.o",
+                "build/x16/math/math.o"
             ],
             "sourcePath": "basic",
             "includes": [
                 "c:\\dev\\CC65\\lib\\cx16.lib",
                 "c:\\dev\\CC65\\asminc\\longbranch.mac"
             ],
-            "basePath": "x16-rom",
-            "defaultOutputFile": "basic.bin"
+            "basePath": "x16-rom"
         }
     ],
     "outputFolder": "app",
     "romSource": [
         {
-            "filename": "app/kernal.bin",
+            "filename": "app/build/x16/kernal.bin",
             "bank": 0,
             "address": "0xc000"
         },
         {
-            "filename": "app/dos.bin",
+            "filename": "app/build/x16/dos.bin",
             "bank": 2,
             "address": "0xc000"
         },
         {
-            "filename": "app/fat32.bin",
+            "filename": "app/build/x16/fat32.bin",
             "bank": 3,
             "address": "0xc000"
         },
         {
-            "filename": "app/basic.bin",
+            "filename": "app/build/x16/basic.bin",
             "bank": 4,
             "address": "0xc000"
         },

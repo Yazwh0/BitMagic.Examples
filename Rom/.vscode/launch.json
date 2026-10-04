@@ -9,6 +9,7 @@
             "request": "launch",
             "name": "Debug Application",
             "program": "${workspaceFolder}/project.json",
+            "preLaunchTask": "Build ROM",
             "stopOnEntry": true,
             "debugArgs": [],
             "cwd": "${workspaceRoot}"

@@ -1,0 +1,18 @@
+{
+    // Builds the X16Community ROM with debug files before debugging, see README.md.
+    // 'make' runs in WSL, which starts in this folder.
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build ROM",
+            "type": "process",
+            "command": "wsl",
+            "args": [ "make" ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}
