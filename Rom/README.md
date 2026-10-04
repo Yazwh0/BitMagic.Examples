@@ -127,3 +127,9 @@ Each part is written to `outputFolder` with its path, eg `app/build/x16/kernal.b
 The example has source for the kernal, DOS, FAT32 and BASIC. `romBankSymbols` loads the `.sym` files for every bank, so the parts without source still have labels in the disassembly.
 
 Note: `romFile` must point at the `rom.bin` you built (`x16-rom/build/x16/rom.bin`), not the default one, otherwise the source won't match what's running.
+
+## Example
+
+Debugging the X16 ROM with its full source, here stopped on a breakpoint in DOS with the ROM's variables in *Locals*:
+
+![Debugging the X16 ROM](images/rom-debugging.png)
