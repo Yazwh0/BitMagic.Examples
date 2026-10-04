@@ -1,6 +1,6 @@
 # ROM
 
-How to write your own ROM code with BitMagic, and how to debug the official [X16Community ROM](https://github.com/X16Community/x16-rom) with full source.
+How to write your own ROM code with BitMagic, and how to debug the official [X16Community ROM](https://github.com/X16Community/x16-rom) with full source. You can step from your own program into the kernal, DOS or BASIC and see the ROM's source as you go!
 
 ## Writing ROM code
 
@@ -11,7 +11,7 @@ To write ROM code, define a segment that starts in the ROM window and writes to 
 
 .0xc000_entry:
     nop
-.breakpoint
+.breakpoint             ; the debugger stops here once the code is in ROM
     nop
 
     rts
@@ -37,7 +37,7 @@ To tell the emulator where that file goes, add it to `romSource` in `project.jso
 
     lda #16
     sta ROM_BANK
-    jsr $c000
+    jsr $c000           ; steps into ROMEXAMPLE.BIN in bank 16
 
     pla
     sta ROM_BANK
@@ -45,23 +45,37 @@ To tell the emulator where that file goes, add it to `romSource` in `project.jso
 
 ## Debugging the X16Community ROM
 
-The ROM source is included as the `x16-rom` submodule, so clone with `--recurse-submodules`. BitMagic doesn't build the ROM, so build it before you start debugging.
+The ROM source is included as the `x16-rom` submodule, so clone with `--recurse-submodules`. BitMagic doesn't assemble the ROM itself; it uses the debug files that ld65 writes, the same as any other [ca65 project](https://bitmagic.org/debugger/ca65).
 
-### Building the ROM with debug information
+### What you need
 
-BitMagic maps the ROM back to its source using the debug files ld65 writes with `--dbgfile`. The ROM's own `Makefile` doesn't ask for them, and we don't change the submodule, so build it with the `Makefile` in this folder instead:
+- cc65, with `ca65` and `ld65` on your path.
+- `make` and `patch`. On Windows the build runs in WSL, so install them (and cc65) there.
 
-```sh
+### How the ROM is built
+
+BitMagic needs a `.dbg` file for each part of the ROM, written by ld65 with `--dbgfile`. The ROM's own `Makefile` doesn't ask for them, and I don't want to change the submodule, so this folder has its own `Makefile` that builds the ROM for you:
+
+```text
 make
 ```
 
-This needs `make`, `patch` and cc65, eg in WSL. It applies `patches/x16-rom-dbgfile.patch` to a copy of the ROM's `Makefile` in `build/`, which adds `--dbgfile` to each ld65 line, then runs that copy in `x16-rom`. The output is the same as the ROM's own build, plus a `.dbg` file for each part, eg `x16-rom/build/x16/kernal.dbg`. `make clean` runs the ROM's clean.
+It doesn't edit `x16-rom`. Instead it:
 
-If the patch no longer applies after the submodule is updated, recreate it by adding `--dbgfile $(BUILD_DIR)/<part>.dbg` after `-o $@` on each ld65 line of `x16-rom/Makefile` and saving the diff over `patches/x16-rom-dbgfile.patch`.
+1. Applies `patches/x16-rom-dbgfile.patch` to a copy of the ROM's `Makefile`, saved as `build/Makefile.x16-rom`. The patch adds `--dbgfile` to each ld65 line.
+2. Runs that copy in `x16-rom`.
 
-### The project
+The output is the same as the ROM's own build, plus a `.dbg` file next to each part, eg `x16-rom/build/x16/kernal.dbg`. A part that was linked before you had the patch is linked again, so it gets its `.dbg` file too. `make clean` runs the ROM's own clean.
 
-The ROM is made of several parts, each linked separately. Each part is a `cc65` entry in the `files` array of `project.json`. For example, the kernal:
+You don't need to run `make` yourself. `.vscode/tasks.json` has a `Build ROM` task that runs `wsl make`, and `launch.json` runs it every time you press `F5`, so the ROM is always up to date when the debugger starts.
+
+### When the ROM changes
+
+When you update the `x16-rom` submodule, the patch is applied again. If the ROM's `Makefile` has changed too much the patch won't apply, and the build stops with an error rather than building without debug files. To fix it, add `--dbgfile $(BUILD_DIR)/<part>.dbg` after `-o $@` on each ld65 line of `x16-rom/Makefile`, then save the diff over `patches/x16-rom-dbgfile.patch`.
+
+### How the project finds the ROM's source
+
+Each part of the ROM is linked separately, so each part is a `cc65` entry in the `files` array of `project.json`. This is the kernal:
 
 ```json
 {
@@ -80,16 +94,36 @@ The ROM is made of several parts, each linked separately. Each part is a `cc65` 
     ],
     "sourcePath": "kernal",
     "includes": [
-        "c:\dev\CC65\asminc\longbranch.mac"
+        "c:\\dev\\CC65\\asminc\\longbranch.mac"
     ],
     "basePath": "x16-rom"
 }
 ```
 
-- `outputs` names the file as ld65 did, so with the path from the `Makefile`. The load address comes from the debug file.
-- `objectFiles` is optional, and is used to warn if the build is out of date.
-- `includes` are cc65 files the ROM uses from the cc65 install. If the ROM was built in WSL, the debug file has the Linux path, so these are matched by filename. Change them to match your cc65 install.
+| Name | Type | Optional | Description |
+| ---- | ---- | -------- | ----------- |
+| `outputs` | array | No | The part's output file, named as ld65 named it, so with the path from the ROM's `Makefile`. The load address is taken from the debug file. |
+| `debugFile` | string | No | The `.dbg` file written by the build. |
+| `objectFiles` | array | Yes | The part's object files. BitMagic checks them against the output, and warns if the build is out of date. |
+| `sourcePath` | string | Yes | Another folder to search for the part's source. |
+| `includes` | array | Yes | Files the ROM uses from your cc65 install. When the ROM is built in WSL the debug file has the Linux path, so these are matched by filename. Change them to match your cc65 install. |
+| `basePath` | string | No | The folder ld65 ran in, which is `x16-rom`. |
 
-The example has entries for the kernal, DOS, FAT32 and BASIC. Each output is written to `outputFolder` with its path, eg `app/build/x16/kernal.bin`, and added to `romSource` with its bank, so the debugger knows which file is where. `romBankSymbols` loads the symbols for the other banks.
+See [ca65 Projects](https://bitmagic.org/debugger/ca65) for the rest of the options.
 
-When debugging the ROM, `romFile` must point at the `rom.bin` you built (`x16-rom/build/x16/rom.bin`), not the default one, otherwise the source won't match what's running.
+### How the parts are put in the right banks
+
+Each part is written to `outputFolder` with its path, eg `app/build/x16/kernal.bin`. `romSource` then says which bank each one is in, so the debugger can match the code that's running to the right source:
+
+```json
+"romSource": [
+    { "filename": "app/build/x16/kernal.bin", "bank": 0, "address": "0xc000" },
+    { "filename": "app/build/x16/dos.bin",    "bank": 2, "address": "0xc000" },
+    { "filename": "app/build/x16/fat32.bin",  "bank": 3, "address": "0xc000" },
+    { "filename": "app/build/x16/basic.bin",  "bank": 4, "address": "0xc000" }
+]
+```
+
+The example has source for the kernal, DOS, FAT32 and BASIC. `romBankSymbols` loads the `.sym` files for every bank, so the parts without source still have labels in the disassembly.
+
+Note: `romFile` must point at the `rom.bin` you built (`x16-rom/build/x16/rom.bin`), not the default one, otherwise the source won't match what's running.
