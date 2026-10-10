@@ -1,0 +1,61 @@
+import BM="bm.bmasm";
+
+BM.X16Header();
+
+; main only uses what the text library makes public: its print procedure, and the
+; line_count name it exports. Everything else in the library is kept to itself.
+.proc main
+    ldx #<hello
+    ldy #>hello
+    jsr text:print              ; print is public, so main can call it
+
+    ; lines is private, but the library exports it as line_count
+    lda text:line_count         ; 1
+    clc
+    adc #'0'
+    jsr BSOUT                   ; prints 1
+
+    ; Each of these is private to the text library, so would stop the build:
+    ;jsr text:newline           ; a private procedure
+    ;lda #text:RETURN           ; a private constant
+    ;lda text:lines             ; a private variable
+    ;lda text:print:loop        ; a label, private to the text scope (a warning for now)
+
+.wait:
+    jmp wait
+
+.hello:
+    BM.Bytes(BM.StringToPetscii("HELLO FROM MAIN"));
+.endproc
+
+; A small text library. The scope is private, so everything in it is private unless it
+; says public, and only code in the text scope can use it.
+.scope private text
+    .export line_count lines    ; exports are always public: a public name for lines
+
+    .const RETURN 13            ; private
+    .padvar byte lines          ; private: how many lines print has written
+
+    ; the library's one public procedure
+    .proc public print
+        stx source              ; source is the operand of the lda below
+        sty source + 1
+        ldx #0
+    .loop:
+        lda source: $ffff, x    ; an operand label
+        beq done
+        jsr BSOUT
+        inx
+        bne loop
+    .done:
+        jsr newline             ; fine: newline is in the same scope
+        inc lines
+        rts
+    .endproc
+
+    ; private: only code in the text scope can call it
+    .proc newline
+        lda #RETURN
+        jmp BSOUT
+    .endproc
+.endscope

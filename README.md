@@ -14,6 +14,10 @@ git clone --recurse-submodules https://github.com/Yazwh0/BitMagic.Examples.git
 
 An over engineered Hello World! Five different ways to print `HELLO WORLD!`, each using a different BitMagic feature.
 
+## [Visibility](Visibility/README.md)
+
+A small text library that keeps most of itself private, showing `public`, `private` and `.export`.
+
 ## [Data Generation](DataGeneration/README.md)
 
 Uses C# to generate sine tables at compile time, then uses them to move a sprite around the screen.

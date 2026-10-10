@@ -1,0 +1,16 @@
+{
+  "files": [
+    {
+      "type": "bitmagic",
+      "filename": "src/main.bmasm"
+    }
+  ],
+  "outputFolder": "app",
+  "autobootRun": true,
+  "windowScale": 2,
+  "compileOptions": {
+    "binFolder": "bin",
+    "displaySegments": true,
+    "rebuild": false
+  }
+}
