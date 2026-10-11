@@ -16,7 +16,7 @@ An over engineered Hello World! Five different ways to print `HELLO WORLD!`, eac
 
 ## [Visibility](Visibility/README.md)
 
-A small text library that keeps most of itself private, showing `public`, `private` and `.export`.
+A small text library that keeps most of itself private, and exports an operand label so `main` can change what it prints.
 
 ## [Data Generation](DataGeneration/README.md)
 

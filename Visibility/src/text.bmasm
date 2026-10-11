@@ -1,0 +1,46 @@
+file library code
+
+; A small text library, written as plain bmasm. 'file library code' puts all of it in
+; the code section, which goes after the main program.
+;
+; The scope is private, so everything in it is private unless it says public, and only
+; code in the text scope can use it.
+.scope private text
+    ; exports are always public, even in a private scope
+    .export line_count lines                    ; a second name for lines
+    .export reprint print:write                 ; the procedure inside print
+    .export string print:write:source           ; the operand label inside that
+    .export version MAJOR * 256 + MINOR         ; an expression
+
+    .const MAJOR 1              ; private
+    .const MINOR 2              ; private
+    .const RETURN 13            ; private
+    .padvar byte lines          ; private: how many lines have been written
+
+    ; the library's one public procedure: prints the string at X (low) and Y (high)
+    .proc public print
+        stx write:source        ; source is the operand of the lda in write
+        sty write:source + 1
+
+        ; print falls through into write, which prints whatever source points at
+        .proc write
+            ldx #0
+        .loop:
+            lda source: $ffff, x    ; an operand label
+            beq done
+            jsr BSOUT
+            inx
+            bne loop
+        .done:
+            jsr newline         ; fine: newline is in the same scope
+            inc lines
+            rts
+        .endproc
+    .endproc
+
+    ; private: only code in the text scope can call it
+    .proc newline
+        lda #RETURN
+        jmp BSOUT
+    .endproc
+.endscope
