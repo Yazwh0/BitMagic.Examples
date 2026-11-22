@@ -21,9 +21,9 @@ Each line starts at the centre of the screen and draws 80 pixels, with an X incr
 
 The steep 4bpp lines are the interesting ones. In the VERA Verilog (`addr_data.v`), the line helper adds what ADDR0 would step by to ADDR1's address but leaves ADDR1's nibble alone. With ADDR0 on nibble 0, as here, that step is nothing going forwards, and back a byte going backwards. So on hardware the steep 4bpp lines should come out wrong: vertical going right, and two pixels a step going left. The official emulator flips ADDR1's nibble instead, so it draws them correctly.
 
-BitMagic follows the Verilog by default. Set `fixedFxLineDraw` to `true` in `project.json` (or run X16E with `--fixedfxlinedraw`) to draw the steep lines properly, as the official emulator does. See [Fixed FX line draw](https://bitmagic.org/debugger/projectfile#fixed-fx-line-draw).
+BitMagic follows the Verilog by default. Set `fxFixed` to `true` in `project.json` (or run X16E with `--fxfixed`) to draw the steep lines properly, as the official emulator does. See [FX fixed mode](https://bitmagic.org/debugger/projectfile#fx-fixed-mode).
 
-| `fixedFxLineDraw` | Steep 4bpp lines going right | Steep 4bpp lines going left |
+| `fxFixed` | Steep 4bpp lines going right | Steep 4bpp lines going left |
 | --- | --- | --- |
 | `false` (hardware) | vertical | two pixels a step, so they go past their markers |
 | `true` | reach their markers | reach their markers |
