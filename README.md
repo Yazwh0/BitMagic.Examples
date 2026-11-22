@@ -30,6 +30,10 @@ References a NuGet package from a `.bmasm` file, using ImageSharp to convert an 
 
 How to use VERA's FX cache to copy VRAM four bytes at a time.
 
+## [FX Line Draw 4bpp](FX/LineDraw4bpp/README.md)
+
+Draws a line in each direction with VERA FX's line draw helper, in 4bpp and 8bpp, to compare against hardware.
+
 ## [Command Line POC](CommandLinePoc/README.md)
 
 A proof of concept for passing parameters to a machine code program from the BASIC prompt, demonstrated with a minimal `cat`.
