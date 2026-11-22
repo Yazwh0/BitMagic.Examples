@@ -1,0 +1,335 @@
+import BM="bm.bmasm";
+
+// Draws 8 lines with the VERA FX line helper, one per octant, in 4bpp and then 8bpp.
+// Run it on hardware and in the emulator and compare. Any key switches between the two.
+//
+// Each line starts at the centre and draws 80 pixels. A white marker is plotted by the CPU (no FX) where the 81st
+// pixel would go, so a correct line runs right up to its marker with no gap and doesn't go past it.
+
+var centreX = 160;
+var centreY = 120;
+var length = 80;
+var increment = 0xc0;                   // 6.9 fixed point, $c0 / $200 = 3/8 of a pixel
+
+// The minor axis position of pixel k. The helper starts half way through a pixel and adds the increment after
+// each write, stepping on each time it passes a whole pixel.
+int MinorAt(int k) => (256 + k * increment) >> 9;
+
+// octant order: right-down, left-down, right-up, left-up; shallow then steep
+int[] sx = new int[] { 1, -1, 1, -1, 1, -1, 1, -1 };
+int[] sy = new int[] { 1, 1, -1, -1, 1, 1, -1, -1 };
+bool[] steep = new bool[] { false, false, false, false, true, true, true, true };
+
+int PixelX(int line, int k) => centreX + sx[line] * (steep[line] ? MinorAt(k) : k);
+int PixelY(int line, int k) => centreY + sy[line] * (steep[line] ? k : MinorAt(k));
+
+.const zp_table $22                     ; and $23
+.const zp_mode $24                      ; 0 = 4bpp, 1 = 8bpp
+.const zp_fxctrl $25
+.const zp_pages $26                     ; and $27
+
+.const GETIN $ffe4
+
+BM.X16Header();
+    sei
+
+.main:
+    stz zp_mode
+    jsr draw_screen
+    jsr wait_key
+
+    lda #1
+    sta zp_mode
+    jsr draw_screen
+    jsr wait_key
+
+    bra main
+
+.proc wait_key
+    cli
+.wait:
+    jsr GETIN
+    beq wait
+    sei
+    rts
+.endproc
+
+.proc draw_screen
+    stz CTRL                            ; DCSEL 0, ADDRSEL 0
+
+    lda DC_VIDEO                        ; layer 0 only, keep the output mode
+    and #$0f
+    ora #$10
+    sta DC_VIDEO
+
+    lda #64                             ; 320x240
+    sta DC_HSCALE
+    sta DC_VSCALE
+
+    stz L0_TILEBASE                     ; bitmap at $00000, 320 wide
+    stz L0_HSCROLL_H                    ; palette offset 0
+
+    lda zp_mode
+    bne eight_bpp
+
+    lda #%00000110                      ; bitmap, 4bpp
+    sta L0_CONFIG
+    lda #$bb                            ; dark grey
+    jsr clear
+
+    lda #<lines_4bpp
+    sta zp_table
+    lda #>lines_4bpp
+    sta zp_table + 1
+    lda #%00000101                      ; 4 bit mode, line draw
+    sta zp_fxctrl
+    bra draw
+
+.eight_bpp:
+    lda #%00000111                      ; bitmap, 8bpp
+    sta L0_CONFIG
+    lda #$0b                            ; dark grey
+    jsr clear
+
+    lda #<lines_8bpp
+    sta zp_table
+    lda #>lines_8bpp
+    sta zp_table + 1
+    lda #%00000001                      ; line draw
+    sta zp_fxctrl
+
+.draw:
+    ldy #0
+.line_loop:
+    jsr draw_line
+    cpy #8 * 5
+    bne line_loop
+
+    lda #DC_SEL_2                       ; FX off before plotting the markers
+    sta CTRL
+    stz FX_CTRL
+    stz CTRL
+
+    lda zp_mode
+    bne eight_bpp_markers
+
+    lda #<markers_4bpp
+    sta zp_table
+    lda #>markers_4bpp
+    sta zp_table + 1
+    jsr draw_markers
+    jsr nibble_strip
+    bra done
+
+.eight_bpp_markers:
+    lda #<markers_8bpp
+    sta zp_table
+    lda #>markers_8bpp
+    sta zp_table + 1
+    jsr draw_markers
+
+.done:
+    lda #DC_SEL_2
+    sta CTRL
+    stz FX_CTRL
+    stz CTRL
+    rts
+.endproc
+
+; A = value. Clears 300 pages from $00000, enough for 320x240 at 8bpp.
+.proc clear
+    stz CTRL
+    ldx #$10                            ; increment 1
+    stx ADDRx_H
+    stz ADDRx_M
+    stz ADDRx_L
+
+    ldx #<300
+    stx zp_pages
+    ldx #>300
+    stx zp_pages + 1
+
+.page:
+    ldx #0
+.byte_loop:
+    sta DATA0
+    dex
+    bne byte_loop
+
+    dec zp_pages
+    bne page
+    ldx zp_pages + 1
+    beq cleared
+    dec zp_pages + 1
+    bra page
+
+.cleared:
+    rts
+.endproc
+
+; Y = offset of the line in the table, moves on to the next one.
+; Table: ADDR1 L, ADDR1 M, ADDR1 H, ADDR0 H, colour
+.proc draw_line
+    lda #DC_SEL_2                       ; DCSEL 2, ADDRSEL 0
+    sta CTRL
+
+    phy
+    iny
+    iny
+    iny
+    lda (zp_table), y                   ; ADDR0's increment, added when x passes a whole pixel
+    sta ADDRx_H
+    ply
+
+    lda zp_fxctrl
+    sta FX_CTRL
+
+    lda #DC_SEL_2 + 1                   ; DCSEL 2, ADDRSEL 1
+    sta CTRL
+
+    lda (zp_table), y
+    sta ADDRx_L
+    iny
+    lda (zp_table), y
+    sta ADDRx_M
+    iny
+    lda (zp_table), y                   ; ADDR1's increment, nibble and bit 16
+    sta ADDRx_H
+    iny
+    iny
+
+    lda #DC_SEL_3                       ; DCSEL 3, ADDRSEL 0
+    sta CTRL
+    lda #@(increment & 0xff)
+    sta FX_X_INCR_L
+    lda #@(increment >> 8)              ; also resets the sub pixel position to a half
+    sta FX_X_INCR_H
+
+    lda (zp_table), y                   ; colour
+    iny
+
+    ldx #@(length)
+.pixel:
+    sta DATA1
+    dex
+    bne pixel
+
+    rts
+.endproc
+
+; Plots 8 markers with the CPU, FX is off.
+; Table: L, M, H, keep mask, value
+.proc draw_markers
+    stz CTRL
+    ldy #0
+.marker:
+    lda (zp_table), y
+    sta ADDRx_L
+    iny
+    lda (zp_table), y
+    sta ADDRx_M
+    iny
+    lda (zp_table), y                   ; bit 16, increment 0
+    sta ADDRx_H
+    iny
+
+    lda DATA0
+    and (zp_table), y
+    iny
+    ora (zp_table), y
+    iny
+    sta DATA0
+
+    cpy #8 * 5
+    bne marker
+    rts
+.endproc
+
+; 4bpp only. With 4 bit mode on and the line helper off, writes $23 and $45 alternately through DATA0 with a nibble
+; increment, starting on nibble 0 at (8, 8), for 4 rows. What appears shows how 4 bit mode writes work:
+;   red, green, red, green...      only the addressed nibble is written, taken from the matching nibble of the value
+;   cyan, green, cyan, green...    only the addressed nibble is written, taken from the low nibble of the value
+;   anything else                  whole bytes are written
+.proc nibble_strip
+    lda #DC_SEL_2
+    sta CTRL
+    lda #%00000100                      ; 4 bit mode
+    sta FX_CTRL
+    stz CTRL
+
+    for (var row = 0; row < 4; row++)
+    {
+        var address = (8 + row) * 160 + 4;
+        lda #@(address & 0xff)
+        sta ADDRx_L
+        lda #@((address >> 8) & 0xff)
+        sta ADDRx_M
+        lda #%00000100                  ; increment 0, nibble increment, nibble 0
+        sta ADDRx_H
+
+        ldx #8
+    .strip:
+        lda #$23
+        sta DATA0
+        lda #$45
+        sta DATA0
+        dex
+        bne -strip
+    }
+
+    lda #DC_SEL_2
+    sta CTRL
+    stz FX_CTRL
+    stz CTRL
+    rts
+.endproc
+
+; 4bpp: 160 bytes a row, nibble 0 is the left pixel (the high nibble).
+; Shallow lines step ADDR1 half a byte, and ADDR0 a row. Steep lines are the other way round.
+.lines_4bpp:
+    for (var i = 0; i < 8; i++)
+    {
+        var x = PixelX(i, 0);
+        var y = PixelY(i, 0);
+        var address = y * 160 + x / 2;
+        var half = sx[i] > 0 ? 0x04 : 0x0c;
+        var row = sy[i] > 0 ? 0xd0 : 0xd8;
+        var addr1 = (steep[i] ? row : half) | ((x & 1) << 1) | (address >> 16);
+        var addr0 = steep[i] ? half : row;
+        var colour = (i + 2) * 0x11;
+        .byte @(address & 0xff), @((address >> 8) & 0xff), @(addr1), @(addr0), @(colour)
+    }
+
+; 8bpp: 320 bytes a row.
+.lines_8bpp:
+    for (var i = 0; i < 8; i++)
+    {
+        var x = PixelX(i, 0);
+        var y = PixelY(i, 0);
+        var address = y * 320 + x;
+        var one = sx[i] > 0 ? 0x10 : 0x18;
+        var row = sy[i] > 0 ? 0xe0 : 0xe8;
+        var addr1 = (steep[i] ? row : one) | (address >> 16);
+        var addr0 = steep[i] ? one : row;
+        .byte @(address & 0xff), @((address >> 8) & 0xff), @(addr1), @(addr0), @(i + 2)
+    }
+
+.markers_4bpp:
+    for (var i = 0; i < 8; i++)
+    {
+        var x = PixelX(i, length);
+        var y = PixelY(i, length);
+        var address = y * 160 + x / 2;
+        var keep = (x & 1) == 0 ? 0x0f : 0xf0;
+        var value = (x & 1) == 0 ? 0x10 : 0x01;
+        .byte @(address & 0xff), @((address >> 8) & 0xff), @(address >> 16), @(keep), @(value)
+    }
+
+.markers_8bpp:
+    for (var i = 0; i < 8; i++)
+    {
+        var x = PixelX(i, length);
+        var y = PixelY(i, length);
+        var address = y * 320 + x;
+        .byte @(address & 0xff), @((address >> 8) & 0xff), @(address >> 16), $00, $01
+    }
